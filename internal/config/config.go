@@ -7,7 +7,7 @@ import (
 )
 
 type Config struct {
-	DbUrl string `json:"db_url"`
+	DbURL    string `json:"db_url"`
 	CurrUser string `json:"current_user_name"`
 }
 
@@ -28,7 +28,7 @@ func Read() *Config {
 	return &cfg
 }
 
-func (c *Config)SetUser(usr string) {
+func (c *Config) SetUser(usr string) {
 	c.CurrUser = usr
 	write(c)
 }
@@ -38,7 +38,7 @@ func getConfigPath() string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return homePath+configFileName
+	return homePath + configFileName
 }
 
 func write(cfg *Config) error {
