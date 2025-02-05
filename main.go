@@ -12,7 +12,7 @@ func main() {
 		cfg,
 	}
 	cmds := commands{
-		dict: make(map[string]func(*state, command) error),
+		handlers: make(map[string]func(*state, command) error),
 	}
 	cmds.register("login", handlerLogin)
 	args := os.Args
