@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"gator/internal/database"
 )
 
-func handlerFeeds(s *state, cmd command) error {
+func handlerFeeds(s *state, cmd command, user database.User) error {
 	feeds, err := s.db.GetFeeds(context.Background())
 	if err != nil {
 		return fmt.Errorf("error getting feeds: %w", err)
@@ -14,11 +15,7 @@ func handlerFeeds(s *state, cmd command) error {
 	for _, feed := range feeds {
 		fmt.Printf("%s\n", feed.Name)
 		fmt.Printf("  - URL: %s\n", feed.Url)
-		usr, err := s.db.GetUserByID(context.Background(), feed.UserID)
-		if err != nil {
-			return fmt.Errorf("error getting user: %w", err)
-		}
-		fmt.Printf("  - Owner: %s\n", usr.Name)
+		fmt.Printf("  - Owner: %s\n", user.Name)
 	}
 	return nil
 }

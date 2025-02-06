@@ -10,12 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAddFeed(s *state, cmd command) error {
-	usr, err := s.db.GetUser(context.Background(), s.cfg.CurrUser)
-	if err != nil {
-		return fmt.Errorf("error retrieving current user: %w", err)
-	}
-
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.args) != 2 {
 		return fmt.Errorf("usage: addfeed <name> <url>")
 	}
@@ -23,7 +18,7 @@ func handlerAddFeed(s *state, cmd command) error {
 	name := cmd.args[0]
 	feedUrl := cmd.args[1]
 
-	_, err = url.Parse(feedUrl)
+	_, err := url.Parse(feedUrl)
 	if err != nil {
 		return fmt.Errorf("url argument did not contain a valid url: %s. encountered the following error: %w", feedUrl, err)
 	}
@@ -34,7 +29,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now(),
 		Name: name,
 		Url: feedUrl,
-		UserID: usr.ID,
+		UserID: user.ID,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating feed: %w", err)
@@ -44,7 +39,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		ID: uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		UserID: usr.ID,
+		UserID: user.ID,
 		FeedID: feed.ID,
 	})
 
