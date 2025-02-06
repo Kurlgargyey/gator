@@ -18,10 +18,10 @@ func handlerRegister(s *state, cmd command) error {
 		log.Fatal(errors.New("username already taken"))
 	}
 	s.db.CreateUser(context.Background(), database.CreateUserParams{
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Name: cmd.args[0],
+		Name:      cmd.args[0],
 	})
 	return handlerLogin(s, cmd)
 }
