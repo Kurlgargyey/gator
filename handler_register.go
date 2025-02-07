@@ -20,7 +20,6 @@ func handlerRegister(s *state, cmd command) error {
 	s.db.CreateUser(context.Background(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 		Name:      cmd.args[0],
 	})
 	return handlerLogin(s, cmd)

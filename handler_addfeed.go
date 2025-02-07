@@ -26,10 +26,10 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Name:      name,
-		Url:       feedUrl,
-		UserID:    user.ID,
+
+		Name:   name,
+		Url:    feedUrl,
+		UserID: user.ID,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating feed: %w", err)
@@ -38,9 +38,9 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 	_, err = s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		UserID:    user.ID,
-		FeedID:    feed.ID,
+
+		UserID: user.ID,
+		FeedID: feed.ID,
 	})
 
 	if err != nil {

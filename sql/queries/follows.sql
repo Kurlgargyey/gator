@@ -4,9 +4,9 @@ WITH inserted_follow as (
     VALUES (
         $1,
         $2,
+        $2,
         $3,
-        $4,
-        $5
+        $4
     )
     RETURNING *
 ) SELECT inserted_follow.*, users.name as user_name, feeds.name as feed_name from inserted_follow
