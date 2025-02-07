@@ -5,7 +5,7 @@ gator is a basic RSS Feed aggregator!
 ## How to use
 
 ### Requirements
-You will need the Go runtime and PostgreSQL installed on your machine
+You will need the Go toolchain and PostgreSQL installed on your machine
 
 ### Setup
 place a `.gatorconfig.json` file in your home directory containing `{"db_url":"<CONNECTION_STRING>"`, where CONNECTION_STRING is a valid connection string to a postgresql DB with the ?sslmode=disable flag set.
