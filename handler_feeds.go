@@ -13,6 +13,11 @@ func handlerFeeds(s *state, cmd command, user database.User) error {
 	}
 
 	for _, feed := range feeds {
+		user, err := s.db.GetUserByID(context.Background(), feed.UserID)
+		if err != nil {
+			return fmt.Errorf("couldn't find the owner of this feed")
+		}
+
 		fmt.Printf("%s\n", feed.Name)
 		fmt.Printf("  - URL: %s\n", feed.Url)
 		fmt.Printf("  - Owner: %s\n", user.Name)

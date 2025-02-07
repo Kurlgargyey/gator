@@ -26,7 +26,7 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 	}
 
 	posts, err := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{
-		UserID: user.ID,
+		UserID:    user.ID,
 		PostLimit: int32(PostLimit),
 	})
 

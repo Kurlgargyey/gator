@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"gator/internal/config"
 	"gator/internal/database"
 )
@@ -24,5 +25,9 @@ func (c *commands) register(name string, f func(*state, command) error) {
 }
 
 func (c *commands) run(s *state, cmd command) error {
-	return c.handlers[cmd.name](s, cmd)
+	if cm, ok := c.handlers[cmd.name]; ok {
+		return cm(s, cmd)
+	} else {
+		return fmt.Errorf("unknown command")
+	}
 }
