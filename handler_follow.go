@@ -27,11 +27,11 @@ func handlerFollow(s *state, cmd command, user database.User) error {
 	}
 
 	follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
-		ID: uuid.New(),
+		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		UserID: user.ID,
-		FeedID: feed.ID,
+		UserID:    user.ID,
+		FeedID:    feed.ID,
 	})
 	if err != nil {
 		return fmt.Errorf("error creating follow: %w", err)

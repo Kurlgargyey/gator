@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/xml"
 	"fmt"
+	"gator/internal/database"
 	"html"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type RSSFeed struct {
@@ -70,4 +73,31 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	}
 
 	return &rssFeed, nil
+}
+
+func scrapeFeeds(s *state) error {
+	nextFeed, err := s.db.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return fmt.Errorf("error getting next feed URL: %w", err)
+	}
+	s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{
+		ID: nextFeed.ID,
+		LastFetchedAt: sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		},
+	})
+	feed, err := fetchFeed(context.Background(), nextFeed.Url)
+	if err != nil {
+		return fmt.Errorf("error fetching next feed: %w", err)
+	}
+	fmt.Printf("Items in feed %s:\n", feed.Channel.Title)
+	for i, item := range feed.Channel.Item {
+		if i > 4 {
+			break
+		}
+		fmt.Printf("  - %s\n", item.Title)
+	}
+
+	return nil
 }
