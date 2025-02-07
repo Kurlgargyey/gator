@@ -17,6 +17,9 @@ func handlerAgg(s *state, cmd command) error {
 	fmt.Printf("Collecting feeds every %v\n", timeBetweenReqs)
 	ticker := time.NewTicker(timeBetweenReqs)
 	for ; ; <-ticker.C {
-		scrapeFeeds(s)
+		err = scrapeFeeds(s)
+		if err != nil {
+			return fmt.Errorf("error scraping feeds: %w", err)
+		}
 	}
 }

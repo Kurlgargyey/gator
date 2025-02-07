@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type RSSFeed struct {
@@ -80,6 +82,11 @@ func scrapeFeeds(s *state) error {
 	if err != nil {
 		return fmt.Errorf("error getting next feed URL: %w", err)
 	}
+	fmt.Println("fetching feed...")
+	feed, err := fetchFeed(context.Background(), nextFeed.Url)
+	if err != nil {
+		return fmt.Errorf("error fetching next feed: %w", err)
+	}
 	s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{
 		ID: nextFeed.ID,
 		LastFetchedAt: sql.NullTime{
@@ -87,17 +94,50 @@ func scrapeFeeds(s *state) error {
 			Valid: true,
 		},
 	})
-	feed, err := fetchFeed(context.Background(), nextFeed.Url)
-	if err != nil {
-		return fmt.Errorf("error fetching next feed: %w", err)
-	}
-	fmt.Printf("Items in feed %s:\n", feed.Channel.Title)
-	for i, item := range feed.Channel.Item {
-		if i > 4 {
-			break
+	fmt.Printf("fetching posts from feed %s\n", feed.Channel.Title)
+	for _, item := range feed.Channel.Item {
+		pubDate, err := parsePubDate(item.PubDate)
+		if err != nil {
+			return fmt.Errorf("bad pubdate format: %s. error: %w", item.PubDate, err)
 		}
-		fmt.Printf("  - %s\n", item.Title)
+		post, err := s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:          uuid.New(),
+			CreatedAt:   time.Now(),
+			Title:       item.Title,
+			Url:         item.Link,
+			Description: parseDescription(item.Description),
+			PublishedAt: pubDate,
+			FeedID:      nextFeed.ID,
+		})
+		if err != nil && err.Error() == "pq: duplicate key value violates unique constraint \"posts_url_key\"" {
+			continue
+		}
+		if err != nil {
+			return fmt.Errorf("error creating post: %w", err)
+		}
+		fmt.Printf("created post: %s\n", post.Title)
 	}
 
 	return nil
+}
+
+func parsePubDate(dateString string) (time.Time, error) {
+	_ = "Mon, 02 Jan 2006 15:04:05 +0000"
+	return time.Parse(time.RFC1123Z, dateString)
+}
+
+func parseDescription(description string) sql.NullString {
+	var sqlDescription sql.NullString
+	if len(strings.TrimSpace(description)) == 0 {
+		sqlDescription = sql.NullString{
+			String: "",
+			Valid:  false,
+		}
+	} else {
+		sqlDescription = sql.NullString{
+			String: strings.TrimSpace(description),
+			Valid:  true,
+		}
+	}
+	return sqlDescription
 }

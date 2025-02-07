@@ -17,5 +17,8 @@ WITH user_follows as (
     SELECT feed_id from feed_follows
     WHERE feed_follows.user_id = $1
 )
+
 SELECT posts.* FROM posts
-INNER JOIN user_follows ON posts.feed_id = user_follows.feed_id;
+INNER JOIN user_follows ON posts.feed_id = user_follows.feed_id
+ORDER BY published_at DESC
+LIMIT sqlc.arg(post_limit);
